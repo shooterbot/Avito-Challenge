@@ -85,7 +85,7 @@ func (bh *BalanceHandlers) AddByUserId(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
-	amount, err := strconv.Atoi(strAmount[0])
+	amount, err := strconv.ParseFloat(strAmount[0], 64)
 	if err != nil {
 		fmt.Println("Received an invalid query parameter for AddByUserId")
 		http.Error(w, "Failed to get user balance: invalid query parameter (amount must be integer)", http.StatusBadRequest)
