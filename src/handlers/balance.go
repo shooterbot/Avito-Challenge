@@ -146,5 +146,13 @@ func (bh *BalanceHandlers) Reserve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = bh.bc.AddReservation(userId, serviceId, amount)
+	if err != nil {
+		fmt.Println("Failed to update user balance")
+		http.Error(w, "Error while updating balance", http.StatusInternalServerError)
+		return
+	}
+
+	// Completing request
+	w.WriteHeader(http.StatusOK)
 
 }
