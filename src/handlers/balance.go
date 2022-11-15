@@ -152,7 +152,7 @@ func (bh *BalanceHandlers) AddReservation(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = bh.bc.AddReservation(userId, serviceId, amount, orderId)
+	err = bh.bc.AddReservation(userId, orderId, serviceId, amount)
 	if err != nil {
 		fmt.Println("Failed to add a reservation")
 		http.Error(w, "Error while reserving balance", http.StatusInternalServerError)
@@ -205,7 +205,7 @@ func (bh *BalanceHandlers) CommitReservation(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = bh.bc.CommitReservation(userId, serviceId, orderId)
+	err = bh.bc.CommitReservation(userId, orderId, serviceId)
 	if err != nil {
 		fmt.Println("Failed to close reservation")
 		http.Error(w, "Failed to close reservation", http.StatusInternalServerError)
