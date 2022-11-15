@@ -1,6 +1,7 @@
 package uc_implementation
 
 import (
+	"Avito-Challenge/src/accounting"
 	"Avito-Challenge/src/repositories"
 	"errors"
 )
@@ -24,7 +25,7 @@ func (bc *BalanceUsecases) AddByUserId(id int, amount float64) error {
 	return bc.br.AddByUserId(id, amount)
 }
 
-func (bc *BalanceUsecases) AddReservation(userId int, serviceId int, amount float64) error {
+func (bc *BalanceUsecases) AddReservation(userId, orderId, serviceId int, amount float64) error {
 	current, err := bc.br.GetByUserId(userId)
 	if err != nil {
 		return err
@@ -37,7 +38,7 @@ func (bc *BalanceUsecases) AddReservation(userId int, serviceId int, amount floa
 	if err != nil {
 		return err
 	}
-	err = bc.br.AddReservation(userId, userId, amount)
+	err = bc.br.AddReservation(userId, orderId, serviceId, amount)
 	if err != nil {
 		// Must return money if reservation has failed
 		// Creating new local err to return the actual error message
@@ -45,4 +46,13 @@ func (bc *BalanceUsecases) AddReservation(userId int, serviceId int, amount floa
 		}
 	}
 	return err
+}
+
+func (bc *BalanceUsecases) CommitReservation(userId, orderId, serviceId int) error {
+	amount, err := bc.br.GetReserved(orderId, serviceId)
+	if err != nil {
+		return err
+	}
+	accounting.RecordProfit(serviceId, amount)
+	return bc.br.CommitReservation(userId, orderId, serviceId)
 }
