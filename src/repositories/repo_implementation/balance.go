@@ -18,11 +18,15 @@ const (
 	// DeleteReservation Вообще, для удаления записи о резерве достаточно только ID заказа, он должен быть уникальным
 	// (и, например, ссылаться на заказ, в ктором уже хранится ID услуги), иначе в нем нет смысла. Но, раз по ТЗ
 	// остальные параметры тоже передаются в запросе - можно сделать проверку и по ним
-	DeleteReservation = `delete from reservations where user_id = $1 and service_id = $2 and order_id = $3;`
+	DeleteReservation = `delete from reservations where user_id = $1 and service_id = $2 and order_id = $3 amd amount = $4;`
 )
 
 type BalanceRepository struct {
 	db *pgdb.DBManager
+}
+
+func NewBalanceRepository(manager *pgdb.DBManager) *BalanceRepository {
+	return &BalanceRepository{db: manager}
 }
 
 func (br *BalanceRepository) GetByUserId(id int) (float64, error) {
@@ -87,8 +91,8 @@ func (br *BalanceRepository) GetReserved(orderId int, serviceId int) (float64, e
 	return res, err
 }
 
-func (br *BalanceRepository) CommitReservation(userId, orderId, serviceId int) error {
-	affected, err := br.db.Exec(DeleteReservation, userId, serviceId, orderId)
+func (br *BalanceRepository) CommitReservation(userId, orderId, serviceId int, amount float64) error {
+	affected, err := br.db.Exec(DeleteReservation, userId, serviceId, orderId, amount)
 	if err != nil && affected == 0 {
 		err = errors.New("Error while updating user reservation")
 	}
