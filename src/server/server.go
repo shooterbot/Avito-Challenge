@@ -32,7 +32,7 @@ func RunServer(address string, connectionString string) error {
 	bh := handlers.NewBalanceHandlers(bc)
 
 	apiRouter.HandleFunc("/balances", bh.GetByUserId).Methods(http.MethodGet)
-	apiRouter.HandleFunc("/balances", bh.AddByUserId).Methods(http.MethodPatch)
+	apiRouter.HandleFunc("/balances", bh.AddByUserId).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/reservations", bh.AddReservation).Methods(http.MethodPut)
 	apiRouter.HandleFunc("/reservations", bh.CommitReservation).Methods(http.MethodDelete)
 
