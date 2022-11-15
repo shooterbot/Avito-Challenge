@@ -93,7 +93,7 @@ func (br *BalanceRepository) GetReserved(orderId int, serviceId int) (float64, e
 
 func (br *BalanceRepository) CommitReservation(userId, orderId, serviceId int, amount float64) error {
 	affected, err := br.db.Exec(DeleteReservation, userId, serviceId, orderId, amount)
-	if err != nil && affected == 0 {
+	if err != nil || affected == 0 {
 		err = errors.New("Error while updating user reservation")
 	}
 	return err
