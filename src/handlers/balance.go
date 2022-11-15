@@ -14,7 +14,7 @@ type BalanceHandlers struct {
 }
 
 func NewBalanceHandlers(balanceCase usecases.IBalanceUsecase) *BalanceHandlers {
-	return &BalancesHandlers{bc: balanceCase}
+	return &BalanceHandlers{bc: balanceCase}
 }
 
 func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
