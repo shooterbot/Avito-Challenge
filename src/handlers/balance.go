@@ -204,8 +204,14 @@ func (bh *BalanceHandlers) CommitReservation(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
+	amount, err := strconv.ParseFloat(strAmount[0], 64)
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddReservation")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
 
-	err = bh.bc.CommitReservation(userId, orderId, serviceId)
+	err = bh.bc.CommitReservation(userId, orderId, serviceId, amount)
 	if err != nil {
 		fmt.Println("Failed to close reservation")
 		http.Error(w, "Failed to close reservation", http.StatusInternalServerError)
