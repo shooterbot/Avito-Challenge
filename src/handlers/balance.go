@@ -25,6 +25,7 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 		}
 	}(r.Body)
 
+	// Acquiring parameters
 	query := r.URL.Query()
 	strId, present := query["userId"]
 	if !present || len(strId) != 1 {
@@ -33,6 +34,7 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validating parameters
 	id, err := strconv.Atoi(strId[0])
 	if err != nil {
 		fmt.Println("Received an invalid query parameter for GetByUserId")
@@ -40,6 +42,7 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Getting result
 	balance, err := bh.bc.GetByUserId(id)
 	if err != nil {
 		fmt.Println("Failed to get balance from UC")
@@ -47,6 +50,7 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Encoding result
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(balance)
 	if err != nil {
@@ -54,4 +58,48 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode data to json", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (bh *BalanceHandlers) AddByUserId(w http.ResponseWriter, r *http.Request) {
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Failed to close response body")
+		}
+	}(r.Body)
+
+	// Acquiring parameters
+	query := r.URL.Query()
+	strId, idPresent := query["userId"]
+	strAmount, amountPresent := query["amount"]
+	if !(idPresent && amountPresent) || len(strId) != 1 || len(strAmount) != 1 {
+		fmt.Println("Received a wrong query parameter for AddByUserId")
+		http.Error(w, "Failed to update user balance: wrong query parameter", http.StatusBadRequest)
+		return
+	}
+
+	// Validating parameters
+	id, err := strconv.Atoi(strId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddByUserId")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+	amount, err := strconv.Atoi(strAmount[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddByUserId")
+		http.Error(w, "Failed to get user balance: invalid query parameter (amount must be integer)", http.StatusBadRequest)
+		return
+	}
+
+	// Processing request
+	err = bh.bc.AddByUserId(id, amount)
+	if err != nil {
+		fmt.Println("Failed to update user balance")
+		http.Error(w, "Error while updating balance", http.StatusInternalServerError)
+		return
+	}
+
+	// Completing request
+	w.WriteHeader(http.StatusOK)
 }
