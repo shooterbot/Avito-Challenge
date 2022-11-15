@@ -1,17 +1,18 @@
 package uc_implementation
 
 import (
-	"Avito-Challenge/src/accounting"
 	"Avito-Challenge/src/repositories"
+	"Avito-Challenge/src/usecases"
 	"errors"
 )
 
 type BalanceUsecases struct {
 	br repositories.IBalanceRepository
+	ac usecases.IAccountingUsecase
 }
 
-func NewBalanceUsecases(br repositories.IBalanceRepository) *BalanceUsecases {
-	return &BalanceUsecases{br: br}
+func NewBalanceUsecases(br repositories.IBalanceRepository, ac usecases.IAccountingUsecase) *BalanceUsecases {
+	return &BalanceUsecases{br: br, ac: ac}
 }
 
 func (bc *BalanceUsecases) GetByUserId(id int) (float64, error) {
@@ -51,11 +52,10 @@ func (bc *BalanceUsecases) AddReservation(userId, orderId, serviceId int, amount
 	return err
 }
 
-func (bc *BalanceUsecases) CommitReservation(userId, orderId, serviceId int) error {
-	amount, err := bc.br.GetReserved(orderId, serviceId)
+func (bc *BalanceUsecases) CommitReservation(userId, orderId, serviceId int, amount float64) error {
+	err := bc.br.CommitReservation(userId, orderId, serviceId, amount) // This method verifies every parameter including 'amount'
 	if err != nil {
 		return err
 	}
-	accounting.RecordProfit(serviceId, amount)
-	return bc.br.CommitReservation(userId, orderId, serviceId)
+	return bc.ac.RecordProfit(serviceId, amount)
 }
