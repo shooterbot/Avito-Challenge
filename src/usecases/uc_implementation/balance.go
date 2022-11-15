@@ -33,6 +33,9 @@ func (bc *BalanceUsecases) AddReservation(userId, orderId, serviceId int, amount
 	if current < amount {
 		return errors.New("User balance is too low")
 	}
+	if amount < 0 {
+		return errors.New("Wrong parameter: amount must be positive")
+	}
 
 	err = bc.br.Withdraw(userId, amount)
 	if err != nil {
