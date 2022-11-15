@@ -13,7 +13,7 @@ func main() {
 	var err error = nil
 
 	address := "127.0.0.1:31337"
-	conString := MakeConStr("127.0.0.1", 5432, "avito-challenge", "avito", "challenge")
+	conString := MakeConStr("127.0.0.1", 5432, "avito_challenge", "avito", "challenge")
 
 	if err == nil {
 		fmt.Printf("Starting server on %s\n", address)
