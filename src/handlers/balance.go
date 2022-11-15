@@ -105,7 +105,7 @@ func (bh *BalanceHandlers) AddByUserId(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (bh *BalanceHandlers) Reserve(w http.ResponseWriter, r *http.Request) {
+func (bh *BalanceHandlers) AddReservation(w http.ResponseWriter, r *http.Request) {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -117,10 +117,11 @@ func (bh *BalanceHandlers) Reserve(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	strUserId, userIdPresent := query["userId"]
 	strServiceId, serviceIdPresent := query["serviceId"]
+	strOrderId, orderIdPresent := query["orderId"]
 	strAmount, amountPresent := query["amount"]
-	if !(userIdPresent && serviceIdPresent && amountPresent) ||
-		len(strUserId) != 1 || len(strAmount) != 1 || len(strServiceId) != 1 {
-		fmt.Println("Received a wrong query parameter for AddByUserId")
+	if !(userIdPresent && serviceIdPresent && orderIdPresent && amountPresent) ||
+		len(strUserId) != 1 || len(strAmount) != 1 || len(strServiceId) != 1 || len(strOrderId) != 1 {
+		fmt.Println("Received a wrong query parameter for Reserve")
 		http.Error(w, "Failed to update user balance: wrong query parameter", http.StatusBadRequest)
 		return
 	}
@@ -132,7 +133,13 @@ func (bh *BalanceHandlers) Reserve(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
-	serviceId, err := strconv.Atoi(strUserId[0])
+	serviceId, err := strconv.Atoi(strServiceId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddReservation")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+	orderId, err := strconv.Atoi(strOrderId[0])
 	if err != nil {
 		fmt.Println("Received an invalid query parameter for AddReservation")
 		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
@@ -145,14 +152,66 @@ func (bh *BalanceHandlers) Reserve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = bh.bc.AddReservation(userId, serviceId, amount)
+	err = bh.bc.AddReservation(userId, serviceId, amount, orderId)
 	if err != nil {
-		fmt.Println("Failed to update user balance")
-		http.Error(w, "Error while updating balance", http.StatusInternalServerError)
+		fmt.Println("Failed to add a reservation")
+		http.Error(w, "Error while reserving balance", http.StatusInternalServerError)
 		return
 	}
 
 	// Completing request
 	w.WriteHeader(http.StatusOK)
 
+}
+
+func (bh *BalanceHandlers) CommitReservation(w http.ResponseWriter, r *http.Request) {
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Failed to close response body")
+		}
+	}(r.Body)
+
+	// Acquiring parameters
+	query := r.URL.Query()
+	strUserId, userIdPresent := query["userId"]
+	strServiceId, serviceIdPresent := query["serviceId"]
+	strOrderId, orderIdPresent := query["orderId"]
+	strAmount, amountPresent := query["amount"]
+	if !(userIdPresent && serviceIdPresent && orderIdPresent && amountPresent) ||
+		len(strUserId) != 1 || len(strAmount) != 1 || len(strServiceId) != 1 || len(strOrderId) != 1 {
+		fmt.Println("Received a wrong query parameter for AddByUserId")
+		http.Error(w, "Failed to update user balance: wrong query parameter", http.StatusBadRequest)
+		return
+	}
+
+	// Validating parameters
+	userId, err := strconv.Atoi(strUserId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddReservation")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+	serviceId, err := strconv.Atoi(strServiceId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddReservation")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+	orderId, err := strconv.Atoi(strOrderId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for AddReservation")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+
+	err = bh.bc.CommitReservation(userId, serviceId, orderId)
+	if err != nil {
+		fmt.Println("Failed to close reservation")
+		http.Error(w, "Failed to close reservation", http.StatusInternalServerError)
+		return
+	}
+
+	// Completing request
+	w.WriteHeader(http.StatusOK)
 }
