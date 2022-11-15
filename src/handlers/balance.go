@@ -26,14 +26,21 @@ func (bh *BalanceHandlers) GetByUserId(w http.ResponseWriter, r *http.Request) {
 	}(r.Body)
 
 	query := r.URL.Query()
-	id, present := query["userId"]
-	if !present || len(id) != 1 {
+	strId, present := query["userId"]
+	if !present || len(strId) != 1 {
 		fmt.Println("Received a wrong query parameter for GetByUserId")
 		http.Error(w, "Failed to get user balance: wrong query parameter", http.StatusBadRequest)
 		return
 	}
 
-	balance, err := bh.bc.GetByUserId(strconv.Atoi(id[0]))
+	id, err := strconv.Atoi(strId[0])
+	if err != nil {
+		fmt.Println("Received an invalid query parameter for GetByUserId")
+		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		return
+	}
+
+	balance, err := bh.bc.GetByUserId(id)
 	if err != nil {
 		fmt.Println("Failed to get balance from UC")
 		http.Error(w, "Error while getting balance", http.StatusInternalServerError)
