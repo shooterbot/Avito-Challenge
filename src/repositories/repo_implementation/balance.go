@@ -37,8 +37,7 @@ func (br *BalanceRepository) GetByUserId(id int) (float64, error) {
 	} else if len(data) == 1 {
 		res = utility.BytesToFloat64(data[0][0])
 	} else {
-		err = errors.New("Could not find a user matching the given id")
-		res = -1
+		res = 0
 	}
 
 	return res, err
