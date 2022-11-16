@@ -5,6 +5,10 @@ import (
 	"encoding/binary"
 )
 
+func BytesToInt(data []byte) int {
+	return int(binary.BigEndian.Uint32(data))
+}
+
 func BytesToFloat64(data []byte) float64 {
 	var res float64
 	buf := bytes.NewReader(data)
