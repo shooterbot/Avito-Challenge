@@ -159,7 +159,7 @@ paths:
           description: Некорректные параметры
     
   /transfer:
-    get:
+    post:
       tags:
         - transfer
       summary: Возвращает список транзакций заданного пользователя
