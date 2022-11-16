@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "avito_challenge"
+      POSTGRES_USER: "avito"
+      POSTGRES_PASSWORD: "challenge"
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+
+  main:
+    build:
+      dockerfile: Dockerfile
+
+    depends_on:
+      - database
+    
+    ports:
+      - 31337:31337
+
