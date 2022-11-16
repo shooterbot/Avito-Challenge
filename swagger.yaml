@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  title: Avito challenge - OpenAPI 3.0
+  description: |-
+
+  
+  contact:
+    email: shooterbot@gmail.com
+
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://127.0.0.1:31337/api/v1
+tags:
+  - name: balances
+    description: Работа непосредственно с балансом пользователя
+  - name: reservations
+    description: Резервирование денег, подверждение и отмена резервации
+  - name: accounting
+    description: Бухгалтерский учет
+  - name: transactions
+    description: Логи транзакций
+paths:
+  /balances:
+    get:
+      tags:
+        - balances
+      summary: Получить текущий баланс пользователя
+      description: Получить текущий баланс пользователя по данному ID
+      parameters:
+        - name: userId
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успех
+          content:
+            application/json:
+              schema:
+                type: integer
+        '400':
+          description: Некорректный query параметр
+    post:
+      tags:
+        - balances
+      summary: Пополнить баланс пользователя
+      description: Увеличивает баланс пользователя
+      requestBody:
+        description: Описание транзакции
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomingTransaction'
+        required: true
+      responses:
+        '200':
+          description: Успех
+        '400':
+          description: Некорректные параметры
+  /balances/transfer:
+    post:
+      tags:
+        - balances
+      summary: Перевод денег между пользователями
+      description: Перевод денег от пользователя sourceUserId пользователю destinationUserId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transfer'
+      responses:
+        '200':
+          description: Успех
+        '400':
+          description: Некорректные параметры
+          
+  /reservations:
+    post:
+      tags:
+        - reservations
+      summary: Резервирование средств с основного баланса на отдельном счете
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '200':
+          description: Успех
+        '400':
+          description: Некорректные параметры
+          
+  /reservations/success:
+    post:
+      tags:
+        - reservations
+      summary: Признание выручки
+      description: Списывает из резерва деньги, добавляет данные в отчет для бухгалтерии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '200':
+          description: Успех
+        '400':
+          description: Некорректные параметры
+  /reservations/abort:
+    post:
+      tags:
+        - reservations
+      summary: Отмена резервации
+      description: Возвращает деньги из резерва на счет пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '200':
+          description: Успех
+        '400':
+          description: Некорректные параметры
+  /accounting:
+    get:
+      tags:
+        - accounting
+      summary: Получение отчета для бухгалтерии
+      description: Записывает в файл, возвращает ссылку на него
+      parameters:
+        - name: year
+          in: query
+          description: интересующий год
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: интересующий месяц
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успех
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "file:///C://report.csv"
+        '400':
+          description: Некорректные параметры
+    
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Возвращает список транзакций заданного пользователя
+      description: Возвращается выписка из упорядоченного списка
+      parameters:
+        - name: userId
+          in: query
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: размер блока пагинации
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: номер блока пагинации
+          required: true
+          schema:
+            type: integer
+        - name: sortBy
+          in: query
+          description: параметр сортировки
+          required: false
+          schema:
+            type: string
+            default: "date"
+            enum:
+              - "date"
+              - "sum"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Некорректные параметры
+
+
+components:
+  schemas:
+    IncomingTransaction:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 10
+        amount:
+          type: number
+          example: 123.45
+        other:
+          type: string
+          example: "Visa"
+        reason:
+          type: string
+          example: "Пополнение счета"
+    Reservation:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 3
+        orderId:
+          type: integer
+          format: int64
+          example: 14
+        serviceId:
+          type: integer
+          format: int64
+          example: 15
+        amount:
+          type: number
+          example: 3.14
+    Transfer:
+      type: object
+      properties:
+        sourceUserId:
+          type: integer
+          format: int64
+          example: 3
+        destinationUserId:
+          type: integer
+          format: int64
+          example: 14
+        amount:
+          type: number
+          example: 3.14
+        reason:
+          type: string
+          example: "Перевод между пользователями"
+    Transaction:
+      type: object
+      properties:
+        UserId:
+          type: integer
+          format: int64
+          example: 3
+        Other:
+          type: string
+          example: "Another user"
+        amount:
+          type: number
+          example: 3.14
+        reason:
+          type: string
+          example: "Перевод между пользователями"
+        date:
+          type: string
+          example: '07.03.2000'
+        
