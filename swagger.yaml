@@ -20,7 +20,7 @@ tags:
     description: Резервирование денег, подверждение и отмена резервации
   - name: accounting
     description: Бухгалтерский учет
-  - name: transactions
+  - name: transfer
     description: Логи транзакций
 paths:
   /balances:
@@ -158,10 +158,10 @@ paths:
         '400':
           description: Некорректные параметры
     
-  /transactions:
+  /transfer:
     get:
       tags:
-        - transactions
+        - transfer
       summary: Возвращает список транзакций заданного пользователя
       description: Возвращается выписка из упорядоченного списка
       parameters:
