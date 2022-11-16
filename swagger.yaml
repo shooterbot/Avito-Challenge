@@ -199,10 +199,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
         '400':
           description: Некорректные параметры
 
@@ -260,3 +259,23 @@ components:
         reason:
           type: string
           example: "Перевод между пользователями"
+    Transaction:
+      type: object
+      properties:
+        UserId:
+          type: integer
+          format: int64
+          example: 3
+        Other:
+          type: string
+          example: "Another user"
+        amount:
+          type: number
+          example: 3.14
+        reason:
+          type: string
+          example: "Перевод между пользователями"
+        date:
+          type: string
+          example: '07.03.2000'
+        
