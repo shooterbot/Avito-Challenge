@@ -34,12 +34,12 @@ func RunServer(address string, connectionString string) error {
 
 	apiRouter.HandleFunc("/balances", bh.GetByUserId).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/balances", bh.AddByUserId).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/balances/transfer", bh.TransferBetweenUsers).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/reservations", bh.AddReservation).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/reservations/success", bh.CommitReservation).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/reservations/abort", bh.AbortReservation).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/accounting", ah.GetReport).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/transactions", ah.GetTransactions).Methods(http.MethodGet)
-	apiRouter.HandleFunc("/transfer", bh.TransferBetweenUsers).Methods(http.MethodPost)
 
 	server := http.Server{
 		Addr:    address,
