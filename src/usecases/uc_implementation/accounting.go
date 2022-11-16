@@ -20,12 +20,27 @@ func (au *AccountingUsecase) RecordProfit(serviceId int, amount float64) error {
 	return au.ar.RecordProfit(serviceId, amount, date)
 }
 
-func (au *AccountingUsecase) GenerateReport(month time.Time) error {
+func (au *AccountingUsecase) GenerateReport(year int, month int) (string, error) {
+	start := fmt.Sprintf("01.%d.%d", month, year)
+	end := fmt.Sprintf("01.%d.%d", month+1, year)
+	report, err := au.ar.CalculateSum(start, end)
+
+	if err != nil {
+		return "", err
+	}
+
 	file, err := os.Create("report.csv")
 	if err != nil {
 		fmt.Println("Could not create report file: ", err)
-		return err
+		return "", err
 	}
 	defer file.Close()
-	return nil
+
+	for id, amount := range report {
+		file.WriteString(fmt.Sprintf("%d;%f\n", id, amount))
+	}
+
+	dir, err := os.Getwd()
+
+	return dir + "\\" + file.Name(), err
 }
