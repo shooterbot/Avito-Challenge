@@ -10,8 +10,8 @@ import (
 const (
 	insertReservation  = `insert into accounting(service_id, amount, completion_date) values($1, $2, $3) returning id;`
 	selectSum          = `select service_id, sum(amount) from accounting where $1 <= completion_date and completion_date < $2 group by service_id;`
-	insertTransaction  = `insert into transactions(user_id, other, reason, date, amount) values($1, $2, $3, $4, $5);`
-	selectTransactions = `select s.* from (select row_number() over (order by %s) rn, * from transactions where user_id = $1) s where $2 <= rn and rn < $3;`
+	insertTransaction  = `insert into transactions(user_id, other, reason, completion_date, amount) values($1, $2, $3, $4, $5);`
+	selectTransactions = `select s.user_id, s.other, s.reason, to_char(s.completion_date,'DD.MM.YYYY'), s.amount from (select row_number() over (order by %s) rn, * from transactions where user_id = $1) s where $2 <= rn and rn < $3;`
 )
 
 type AccountingRepository struct {
