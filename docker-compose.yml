@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: "avito"
       POSTGRES_PASSWORD: "challenge"
     volumes:
-      - .:/docker-entrypoint-initdb.d
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
 

@@ -13,4 +13,4 @@ RUN go mod tidy
 WORKDIR ./src
 RUN go build -o main main.go
 
-CMD ./main -docker
+CMD sleep 10 && ./main -docker

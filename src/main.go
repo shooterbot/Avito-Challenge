@@ -14,7 +14,7 @@ func main() {
 
 	var err error = nil
 
-	address := "127.0.0.1:31337"
+	address := "0.0.0.0:31337"
 	var host string
 	if len(os.Args) > 1 && os.Args[1] == "-docker" {
 		host = "database"
