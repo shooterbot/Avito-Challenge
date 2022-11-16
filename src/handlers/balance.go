@@ -172,3 +172,29 @@ func (bh *BalanceHandlers) AbortReservation(w http.ResponseWriter, r *http.Reque
 	// Completing request
 	w.WriteHeader(http.StatusOK)
 }
+
+func (bh *BalanceHandlers) TransferBetweenUsers(w http.ResponseWriter, r *http.Request) {
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Failed to close response body")
+		}
+	}(r.Body)
+
+	transfer := &models.Transfer{}
+	err := json.NewDecoder(r.Body).Decode(transfer)
+	if err != nil {
+		fmt.Println("Decoding json error: ", err)
+		http.Error(w, "Failed to decode json data", http.StatusBadRequest)
+		return
+	}
+
+	err = bh.bc.Transfer(transfer)
+	if err != nil {
+		fmt.Println("Failed to update user balance")
+		http.Error(w, "Error while updating balance", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

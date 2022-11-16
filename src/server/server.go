@@ -39,6 +39,7 @@ func RunServer(address string, connectionString string) error {
 	apiRouter.HandleFunc("/reservations/abort", bh.AbortReservation).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/accounting", ah.GetReport).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/transactions", ah.GetTransactions).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/transfer", bh.TransferBetweenUsers).Methods(http.MethodPost)
 
 	server := http.Server{
 		Addr:    address,

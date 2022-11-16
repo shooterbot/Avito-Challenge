@@ -8,4 +8,5 @@ type IBalanceUsecase interface {
 	AddReservation(reservation *models.Reservation) error
 	CommitReservation(reservation *models.Reservation) error
 	AbortReservation(reservation *models.Reservation) error
+	Transfer(transfer *models.Transfer) error
 }

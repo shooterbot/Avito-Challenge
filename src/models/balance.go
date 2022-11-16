@@ -13,3 +13,10 @@ type Reservation struct {
 	ServiceId int     `json:"serviceId"`
 	Amount    float64 `json:"amount"`
 }
+
+type Transfer struct {
+	SourceUserId int     `json:"sourceUserId"`
+	DestUserId   int     `json:"destinationUserId"`
+	Amount       float64 `json:"amount"`
+	Reason       string  `json:"reason"`
+}

@@ -58,7 +58,7 @@ func (bc *BalanceUsecases) AddReservation(reservation *models.Reservation) error
 		// и вставить название в поле Reason
 		Reason: "Reserved for a service",
 		Date:   time.Now().Format("2006-01-02"),
-		Amount: reservation.Amount,
+		Amount: -reservation.Amount,
 	})
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (bc *BalanceUsecases) AbortReservation(reservation *models.Reservation) err
 	// Must return money if reservation has been canceled
 	for err = errors.New(""); err != nil; err = bc.br.AddByUserId(reservation.UserId, reservation.Amount) {
 	}
-	
+
 	return bc.ac.LogTransaction(&models.Transaction{
 		UserId: reservation.UserId,
 		Other:  "User reservation bill",
@@ -103,4 +103,46 @@ func (bc *BalanceUsecases) AbortReservation(reservation *models.Reservation) err
 		Date:   time.Now().Format("2006-01-02"),
 		Amount: reservation.Amount,
 	})
+}
+
+func (bc *BalanceUsecases) Transfer(transfer *models.Transfer) error {
+
+	if transfer.Amount < 0 {
+		return errors.New("Wrong parameter: amount must be positive")
+	}
+
+	err := bc.br.Withdraw(transfer.SourceUserId, transfer.Amount)
+	if err != nil {
+		return err
+	}
+	err = bc.ac.LogTransaction(&models.Transaction{
+		UserId: transfer.SourceUserId,
+		Other:  "Another user",
+		Reason: transfer.Reason,
+		Date:   time.Now().Format("2006-01-02"),
+		Amount: -transfer.Amount,
+	})
+	if err != nil {
+		// Must return money if transaction has failed
+		// Creating new local err to return the actual error message
+		for err := errors.New(""); err != nil; err = bc.br.AddByUserId(transfer.SourceUserId, transfer.Amount) {
+		}
+		return err
+	}
+	err = bc.br.AddByUserId(transfer.DestUserId, transfer.Amount)
+	if err != nil {
+		// Must return money if transaction has failed
+		// Creating new local err to return the actual error message
+		for err := errors.New(""); err != nil; err = bc.br.AddByUserId(transfer.SourceUserId, transfer.Amount) {
+		}
+		return err
+	}
+	err = bc.ac.LogTransaction(&models.Transaction{
+		UserId: transfer.DestUserId,
+		Other:  "Another user",
+		Reason: transfer.Reason,
+		Date:   time.Now().Format("2006-01-02"),
+		Amount: transfer.Amount,
+	})
+	return err
 }
