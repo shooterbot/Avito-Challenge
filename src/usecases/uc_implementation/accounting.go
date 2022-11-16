@@ -1,6 +1,7 @@
 package uc_implementation
 
 import (
+	"Avito-Challenge/src/models"
 	"Avito-Challenge/src/repositories"
 	"fmt"
 	"os"
@@ -15,15 +16,15 @@ func NewAccountingUsecases(repo repositories.IAccountingRepository) *AccountingU
 	return &AccountingUsecase{ar: repo}
 }
 
-func (au *AccountingUsecase) RecordProfit(serviceId int, amount float64) error {
+func (ac *AccountingUsecase) RecordProfit(serviceId int, amount float64) error {
 	date := time.Now().Format("2006-01-02")
-	return au.ar.RecordProfit(serviceId, amount, date)
+	return ac.ar.RecordProfit(serviceId, amount, date)
 }
 
-func (au *AccountingUsecase) GenerateReport(year int, month int) (string, error) {
+func (ac *AccountingUsecase) GenerateReport(year int, month int) (string, error) {
 	start := fmt.Sprintf("01.%d.%d", month, year)
 	end := fmt.Sprintf("01.%d.%d", month+1, year)
-	report, err := au.ar.CalculateSum(start, end)
+	report, err := ac.ar.CalculateSum(start, end)
 
 	if err != nil {
 		return "", err
@@ -43,4 +44,8 @@ func (au *AccountingUsecase) GenerateReport(year int, month int) (string, error)
 	dir, err := os.Getwd()
 
 	return dir + "\\" + file.Name(), err
+}
+
+func (ac *AccountingUsecase) LogTransaction(transaction *models.Transaction) error {
+	return ac.ar.LogTransaction(transaction)
 }

@@ -2,6 +2,7 @@ package repo_implementation
 
 import (
 	"Avito-Challenge/src/database/pgdb"
+	"Avito-Challenge/src/models"
 	"Avito-Challenge/src/utility"
 	"fmt"
 )
@@ -9,6 +10,7 @@ import (
 const (
 	insertReservation = `insert into accounting(service_id, amount, completion_date) values($1, $2, $3) returning id;`
 	selectSum         = `select service_id, sum(amount) from accounting where $1 <= completion_date and completion_date < $2 group by service_id;`
+	insertTransaction = `insert into transactions(user_id, other, reason, date, amount) values($1, $2, $3, $4, $5);`
 )
 
 type AccountingRepository struct {
@@ -39,4 +41,9 @@ func (ar *AccountingRepository) CalculateSum(startDate string, endDate string) (
 	}
 
 	return res, nil
+}
+
+func (ar *AccountingRepository) LogTransaction(transaction *models.Transaction) error {
+	_, err := ar.db.Exec(insertTransaction, transaction.UserId, transaction.Other, transaction.Reason, transaction.Date, transaction.Amount)
+	return err
 }

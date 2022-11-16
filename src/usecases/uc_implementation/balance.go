@@ -5,6 +5,7 @@ import (
 	"Avito-Challenge/src/repositories"
 	"Avito-Challenge/src/usecases"
 	"errors"
+	"time"
 )
 
 type BalanceUsecases struct {
@@ -24,6 +25,16 @@ func (bc *BalanceUsecases) AddByUserId(income *models.IncomingTransaction) error
 	if income.Amount < 0 {
 		return errors.New("Wrong parameter: amount must be positive")
 	}
+	err := bc.ac.LogTransaction(&models.Transaction{
+		UserId: income.UserId,
+		Other:  income.Other,
+		Reason: income.Reason,
+		Date:   time.Now().Format("2006-01-02"),
+		Amount: income.Amount,
+	})
+	if err != nil {
+		return err
+	}
 	return bc.br.AddByUserId(income.UserId, income.Amount)
 }
 
@@ -37,6 +48,20 @@ func (bc *BalanceUsecases) AddReservation(reservation *models.Reservation) error
 	}
 	if reservation.Amount < 0 {
 		return errors.New("Wrong parameter: amount must be positive")
+	}
+
+	err = bc.ac.LogTransaction(&models.Transaction{
+		UserId: reservation.UserId,
+		Other:  "User reservation bill",
+		// Можно сделать запрос, получающий название услуги по ID или
+		// полностью заменить использование ID названием услуги
+		// и вставить название в поле Reason
+		Reason: "Reserved for a service",
+		Date:   time.Now().Format("2006-01-02"),
+		Amount: reservation.Amount,
+	})
+	if err != nil {
+		return err
 	}
 
 	err = bc.br.Withdraw(reservation.UserId, reservation.Amount)
