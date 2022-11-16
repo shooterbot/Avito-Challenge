@@ -49,3 +49,7 @@ func (ac *AccountingUsecase) GenerateReport(year int, month int) (string, error)
 func (ac *AccountingUsecase) LogTransaction(transaction *models.Transaction) error {
 	return ac.ar.LogTransaction(transaction)
 }
+
+func (ac *AccountingUsecase) GetTransactions(id int, size int, page int, sortBy string) (*[]models.Transaction, error) {
+	return ac.ar.GetTransactions(id, size, page, sortBy)
+}

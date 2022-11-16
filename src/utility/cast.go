@@ -15,3 +15,7 @@ func BytesToFloat64(data []byte) float64 {
 	_ = binary.Read(buf, binary.BigEndian, &res)
 	return res
 }
+
+func BytesToString(data []byte) string {
+	return string(data)
+}
