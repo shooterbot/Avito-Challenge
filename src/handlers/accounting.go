@@ -83,27 +83,27 @@ func (ah *AccountingHandlers) GetTransactions(w http.ResponseWriter, r *http.Req
 	strPage, pagePresent := query["page"]
 	qSortBy, sortPresent := query["sortBy"]
 	if !(idPresent && sizePresent && pagePresent) || len(strId) != 1 || len(strSize) != 1 || len(strPage) != 1 {
-		fmt.Println("Received a wrong query parameter for GetByUserId")
+		fmt.Println("Received a wrong query parameter for GetTransactions")
 		http.Error(w, "Failed to get user balance: wrong query parameter", http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(strId[0])
 	if err != nil {
-		fmt.Println("Received an invalid query parameter for GetByUserId")
-		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		fmt.Println("Received an invalid query parameter for GetTransactions")
+		http.Error(w, "Failed to get transactions: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
 	size, err := strconv.Atoi(strSize[0])
 	if err != nil {
-		fmt.Println("Received an invalid query parameter for GetByUserId")
-		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		fmt.Println("Received an invalid query parameter for GetTransactions")
+		http.Error(w, "Failed to get transactions: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
 	page, err := strconv.Atoi(strPage[0])
 	if err != nil {
-		fmt.Println("Received an invalid query parameter for GetByUserId")
-		http.Error(w, "Failed to get user balance: invalid query parameter (id must be integer)", http.StatusBadRequest)
+		fmt.Println("Received an invalid query parameter for GetTransactions")
+		http.Error(w, "Failed to get transactions: invalid query parameter (id must be integer)", http.StatusBadRequest)
 		return
 	}
 
