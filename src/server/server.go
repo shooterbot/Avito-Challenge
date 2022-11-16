@@ -37,6 +37,7 @@ func RunServer(address string, connectionString string) error {
 	apiRouter.HandleFunc("/reservations", bh.AddReservation).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/reservations", bh.CommitReservation).Methods(http.MethodDelete)
 	apiRouter.HandleFunc("/accounting", ah.GetReport).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/transactions", ah.GetTransactions).Methods(http.MethodGet)
 
 	server := http.Server{
 		Addr:    address,
