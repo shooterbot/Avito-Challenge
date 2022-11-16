@@ -63,45 +63,10 @@ Readme в процессе создания (будет готов 16.11 до 22
 ![image](https://user-images.githubusercontent.com/73233230/202251589-a609ecbd-af1c-4099-be27-56bbf55dbb8e.png)  
 
 Напоследок посмотрим выписку по транзакциям пользователя 1:  
-![image](https://user-images.githubusercontent.com/73233230/202252013-bd0ca26e-f65b-4836-ba4e-482222a7ba94.png)
+![image](https://user-images.githubusercontent.com/73233230/202254999-8158761a-26b1-4449-9460-cafd458872d9.png)  
 Получчаем следующий список:
 ```
 [
-    {
-        "UserId": 1,
-        "Other": "visa",
-        "Reason": "Пополнение счета",
-        "Date": "16.11.2022",
-        "Amount": 100
-    },
-    {
-        "UserId": 1,
-        "Other": "User reservation bill",
-        "Reason": "Reserved for a service",
-        "Date": "16.11.2022",
-        "Amount": 15.5
-    },
-    {
-        "UserId": 1,
-        "Other": "User reservation bill",
-        "Reason": "Reserved for a service",
-        "Date": "16.11.2022",
-        "Amount": 15.5
-    },
-    {
-        "UserId": 1,
-        "Other": "User reservation bill",
-        "Reason": "Reservation has been canceled",
-        "Date": "16.11.2022",
-        "Amount": 15.5
-    },
-    {
-        "UserId": 1,
-        "Other": "Another user",
-        "Reason": "because",
-        "Date": "16.11.2022",
-        "Amount": -25.5
-    },
     {
         "UserId": 1,
         "Other": "visa",
