@@ -1,8 +1,10 @@
 package usecases
 
+import "Avito-Challenge/src/models"
+
 type IBalanceUsecase interface {
 	GetByUserId(id int) (float64, error)
-	AddByUserId(id int, amount float64) error
-	AddReservation(userId int, orderId int, serviceId int, amount float64) error
-	CommitReservation(userId int, orderId int, serviceId int, amount float64) error
+	AddByUserId(income *models.IncomingTransaction) error
+	AddReservation(reservation *models.Reservation) error
+	CommitReservation(reservation *models.Reservation) error
 }
