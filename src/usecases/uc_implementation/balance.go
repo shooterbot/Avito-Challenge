@@ -79,10 +79,28 @@ func (bc *BalanceUsecases) AddReservation(reservation *models.Reservation) error
 }
 
 func (bc *BalanceUsecases) CommitReservation(reservation *models.Reservation) error {
-	// CommitReservation: This method verifies every parameter including 'amount'
-	err := bc.br.CommitReservation(reservation.UserId, reservation.OrderId, reservation.ServiceId, reservation.Amount)
+	// DeleteReservation: This method verifies every parameter including 'amount'
+	err := bc.br.DeleteReservation(reservation.UserId, reservation.OrderId, reservation.ServiceId, reservation.Amount)
 	if err != nil {
 		return err
 	}
 	return bc.ac.RecordProfit(reservation.ServiceId, reservation.Amount)
+}
+
+func (bc *BalanceUsecases) AbortReservation(reservation *models.Reservation) error {
+	err := bc.br.DeleteReservation(reservation.UserId, reservation.OrderId, reservation.ServiceId, reservation.Amount)
+	if err != nil {
+		return err
+	}
+	// Must return money if reservation has been canceled
+	for err = errors.New(""); err != nil; err = bc.br.AddByUserId(reservation.UserId, reservation.Amount) {
+	}
+	
+	return bc.ac.LogTransaction(&models.Transaction{
+		UserId: reservation.UserId,
+		Other:  "User reservation bill",
+		Reason: "Reservation has been canceled",
+		Date:   time.Now().Format("2006-01-02"),
+		Amount: reservation.Amount,
+	})
 }

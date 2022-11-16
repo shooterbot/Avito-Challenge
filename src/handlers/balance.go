@@ -145,3 +145,30 @@ func (bh *BalanceHandlers) CommitReservation(w http.ResponseWriter, r *http.Requ
 	// Completing request
 	w.WriteHeader(http.StatusOK)
 }
+
+func (bh *BalanceHandlers) AbortReservation(w http.ResponseWriter, r *http.Request) {
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Failed to close response body")
+		}
+	}(r.Body)
+
+	reservation := &models.Reservation{}
+	err := json.NewDecoder(r.Body).Decode(reservation)
+	if err != nil {
+		fmt.Println("Decoding json error: ", err)
+		http.Error(w, "Failed to decode json data", http.StatusBadRequest)
+		return
+	}
+
+	err = bh.bc.AbortReservation(reservation)
+	if err != nil {
+		fmt.Println("Failed to abort reservation")
+		http.Error(w, "Failed to abort reservation", http.StatusInternalServerError)
+		return
+	}
+
+	// Completing request
+	w.WriteHeader(http.StatusOK)
+}

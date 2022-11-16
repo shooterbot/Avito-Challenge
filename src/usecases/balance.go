@@ -7,4 +7,5 @@ type IBalanceUsecase interface {
 	AddByUserId(income *models.IncomingTransaction) error
 	AddReservation(reservation *models.Reservation) error
 	CommitReservation(reservation *models.Reservation) error
+	AbortReservation(reservation *models.Reservation) error
 }
